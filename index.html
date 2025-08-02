@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TRC20 ADDRESS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2a5ee8;
+      --secondary: #0a2342;
+      --accent: #ffc107;
+      --success: #28a745;
+      --text-light: #f8f9fa;
+      --text-muted: #adb5bd;
+      --card-bg: #1a2a4a;
+      --input-bg: #2c3e50;
+    }
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--secondary) 0%, #12233b 100%);
+      color: var(--text-light);
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-sizing: border-box;
+      overflow-y: auto;
+      max-height: 100vh;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    h1 {
+      color: var(--text-light);
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 24px;
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    #qrcode {
+      margin: 20px auto;
+      background: #fff;
+      padding: 15px;
+      display: inline-block;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+    
+    #qrcode:hover {
+      transform: scale(1.05);
+    }
+    
+    .address-container {
+      position: relative;
+      margin: 25px 0;
+    }
+    
+    .address-box {
+      background: var(--input-bg);
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 16px;
+      word-break: break-all;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .address-box:hover {
+      border-color: var(--primary);
+    }
+    
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .copy-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(42, 94, 232, 0.3);
+    }
+    
+    .copy-btn i {
+      font-size: 16px;
+    }
+    
+    .recharge-btn {
+      background: var(--success);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      margin: 20px 0;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .recharge-btn:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .instructions {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 25px;
+      text-align: left;
+    }
+    
+    .instruction-item {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: flex-start;
+    }
+    
+    .instruction-number {
+      background: var(--primary);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .network-badge {
+      background: rgba(42, 94, 232, 0.2);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 15px;
+      border: 1px solid var(--primary);
+    }
+    
+    .tooltip {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+    
+    .copy-btn:hover .tooltip {
+      opacity: 1;
+    }
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 15px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .preview-container {
+      margin-top: 15px;
+      display: none;
+    }
+    
+    .preview-image {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    
+    /* Exchange rate styles */
+    .exchange-rate {
+      background: rgba(255, 193, 7, 0.1);
+      color: var(--accent);
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 15px auto;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      display: inline-block;
+    }
+    
+    .exchange-rate i {
+      margin-right: 8px;
+    }
+
+    /* Prevent scrolling on body */
+    body.no-scroll {
+      overflow: hidden;
+    }
+    
+    /* Hints section */
+    .hints {
+      background: rgba(255, 193, 7, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+    }
+    
+    .hints-title {
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .hints-list {
+      padding-left: 20px;
+      margin: 0;
+    }
+    
+    .hints-list li {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    /* Status indicator */
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      font-size: 14px;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    
+    .status-dot.active {
+      background: var(--success);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        border-radius: 0;
+      }
+      
+      .address-box {
+        font-size: 14px;
+      }
+    }
+
+    /* Upload area styling */
+    .upload-area {
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(42, 94, 232, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 40px;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .upload-text strong {
+      color: var(--primary);
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-wallet"></i>
+    </div>
+    <h1>TRC20 ADDRESS</h1>
+    <div class="network-badge">TRC20 NETWORK</div>
+    <p class="subtitle">Scan the QR code or copy the address below</p>
+    
+    <div class="exchange-rate">
+      <i class="fas fa-exchange-alt"></i>
+      Exchange Rate: 1 USDT = 127 KES
+    </div>
+    
+    <div id="qrcode"></div>
+    
+    <div class="address-container">
+      <div class="address-box" id="wallet">TDURyBZDt2rHSMtcdcL4MEiY1sqdsKoJ7N</div>
+      <button class="copy-btn" onclick="copyAddress()">
+        <i class="far fa-copy"></i>
+        <span>Copy Address</span>
+        <span class="tooltip">Click to copy</span>
+      </button>
+    </div>
+    
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span>Waiting for deposit...</span>
+    </div>
+    
+    <input type="file" id="paymentProof" class="file-input" accept="image/*, .pdf, .png, .jpg, .jpeg" capture="environment">
+    
+    <div class="upload-area" onclick="document.getElementById('paymentProof').click()">
+      <div class="upload-icon">
+        <i class="fas fa-cloud-upload-alt"></i>
+      </div>
+      <div class="upload-text">
+        <strong>Click to upload</strong> or drag and drop<br>
+        Screenshot or photo of your payment (JPG, PNG, PDF)
+      </div>
+    </div>
+    
+    <div class="preview-container" id="previewContainer">
+      <p>Payment proof uploaded:</p>
+      <img id="previewImage" class="preview-image" src="#" alt="Payment proof">
+      <button class="recharge-btn" onclick="submitPayment()" style="margin-top: 15px;">
+        <i class="fas fa-paper-plane"></i> Submit Payment
+      </button>
+    </div>
+    
+    <div class="instructions">
+      <div class="instruction-item">
+        <div class="instruction-number">1</div>
+        <div>Send <strong>only USDT</strong> on the TRC20 network to this address</div>
+      </div>
+      <div class="instruction-item">
+        <div class="instruction-number">2</div>
+        <div>Deposits typically arrive in <strong>1-3 minutes</strong></div>
+      </div>
+      <div class="instruction-item">
+        <div class="instruction-number">3</div>
+        <div>If delayed, refresh this page or contact support</div>
+      </div>
+    </div>
+    
+    <div class="hints">
+      <div class="hints-title">
+        <i class="fas fa-lightbulb"></i>
+        <span>Deposit Completion Hints</span>
+      </div>
+      <ul class="hints-list">
+        <li>Ensure you're sending USDT on the TRC20 network only</li>
+        <li>Double-check the wallet address before sending</li>
+        <li>Include sufficient TRX for transaction fees (minimum 10 TRX recommended)</li>
+        <li>After sending, upload your transaction screenshot as proof</li>
+        <li>Your balance will update automatically after 3 network confirmations</li>
+      </ul>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    // Generate QR Code
+    new QRCode(document.getElementById("qrcode"), {
+      text: "TDURyBZDt2rHSMtcdcL4MEiY1sqdsKoJ7N",
+      width: 180,
+      height: 180,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    
+    // Copy to Clipboard
+    function copyAddress() {
+      const address = document.getElementById("wallet").innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> <span>Copied!</span>';
+        setTimeout(() => {
+          copyBtn.innerHTML = '<i class="far fa-copy"></i> <span>Copy Address</span> <span class="tooltip">Click to copy</span>';
+        }, 2000);
+      });
+    }
+    
+    // Handle file upload
+    document.getElementById('paymentProof').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          Swal.fire({
+            title: 'File too large',
+            text: 'Please upload a file smaller than 5MB',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
+        
+        // Check file type
+        const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!validTypes.includes(file.type)) {
+          Swal.fire({
+            title: 'Invalid file type',
+            text: 'Please upload JPG, PNG, or PDF only',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('previewImage').src = event.target.result;
+          document.getElementById('previewContainer').style.display = 'block';
+          document.body.classList.add('no-scroll');
+          
+          // Update status indicator
+          const statusDot = document.querySelector('.status-dot');
+          const statusText = document.querySelector('.status-indicator span');
+          statusDot.classList.add('active');
+          statusText.textContent = 'Payment proof ready for submission';
+          
+          // Scroll to preview container
+          document.getElementById('previewContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Handle drag and drop
+    const uploadArea = document.querySelector('.upload-area');
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'var(--primary)';
+      uploadArea.style.background = 'rgba(42, 94, 232, 0.2)';
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+      uploadArea.style.background = 'transparent';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+      uploadArea.style.background = 'transparent';
+      
+      if (e.dataTransfer.files.length) {
+        document.getElementById('paymentProof').files = e.dataTransfer.files;
+        const event = new Event('change');
+        document.getElementById('paymentProof').dispatchEvent(event);
+      }
+    });
+    
+    function submitPayment() {
+      const fileInput = document.getElementById('paymentProof');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        Swal.fire({
+          title: 'No file selected',
+          text: 'Please upload your payment proof first',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+      
+      Swal.fire({
+        title: 'Processing Payment',
+        html: 'Please wait while we verify your payment...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          
+          // Simulate processing delay
+          setTimeout(() => {
+            Swal.fire({
+              title: 'Payment Received!',
+              text: 'Your USDT deposit and payment proof have been submitted. Your funds will be processed shortly.',
+              icon: 'success',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#2a5ee8'
+            }).then(() => {
+              // Reset the form after submission
+              fileInput.value = '';
+              document.getElementById('previewContainer').style.display = 'none';
+              document.body.classList.remove('no-scroll');
+              
+              // Update status indicator
+              const statusDot = document.querySelector('.status-dot');
+              const statusText = document.querySelector('.status-indicator span');
+              statusDot.classList.remove('active');
+              statusDot.style.background = '#28a745';
+              statusText.textContent = 'Payment submitted for processing';
+              
+              // Simulate processing completion after 5 seconds
+              setTimeout(() => {
+                statusText.textContent = 'Deposit completed successfully!';
+                Swal.fire({
+                  title: 'Deposit Completed!',
+                  text: 'Your USDT deposit has been processed and your balance has been updated.',
+                  icon: 'success',
+                  confirmButtonText: 'Great!',
+                  confirmButtonColor: '#28a745'
+                });
+              }, 5000);
+            });
+          }, 2000);
+        }
+      });
+    }
+
+    // Prevent scrolling when interacting with the container
+    document.querySelector('.container').addEventListener('touchmove', function(e) {
+      e.stopPropagation();
+    }, { passive: false });
+    
+    // Show network status
+    window.addEventListener('load', function() {
+      // Simulate network check
+      setTimeout(() => {
+        const networkBadge = document.querySelector('.network-badge');
+        networkBadge.innerHTML = '<i class="fas fa-check-circle"></i> TRC20 NETWORK CONNECTED';
+      }, 1000);
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
